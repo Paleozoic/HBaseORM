@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                     http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+                     http://www.springframework.org/schema/context
+                     http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 注解支持 -->
+    <context:annotation-config/>
+    <!-- 扫描com.maxplus1.hd_client目录 -->
+    <context:component-scan base-package="com.maxplus1.hd_client"/>
+
+    <context:property-placeholder location="classpath:config/fihd/my.properties"/>
+
+    <!-- hadoop config -->
+    <bean id="hdConfFactory" class="com.maxplus1.hd_client.hbase.config.FusionInsightConfFactory">
+        <constructor-arg name="confPath" value="${hadoop.conf.confPath}"/>
+        <constructor-arg name="keytabFile" value="${hadoop.conf.keytabFile}"/>
+        <constructor-arg name="kerberosPrincipal" value="${hadoop.conf.kerberosPrincipal}"/>
+    </bean>
+
+    <bean id="hbaseConfiguration" class="com.maxplus1.hd_client.hbase.config.FusionInsightConfFactory" factory-method="buildConfiguration"></bean>
+    <!-- 使用注解注入了大部分的bean -->
+    <bean id="hBaseSource" class="com.maxplus1.hd_client.hbase.config.HBaseSource" >
+        <constructor-arg name="configuration" ref="hbaseConfiguration"/>
+    </bean>
+    <bean id="serializeTypeResolver" class="com.maxplus1.hd_client.hbase.type.resolvers.SerializeTypeResolver">
+        <property name="hbaseSerializer">
+            <bean class="com.maxplus1.hd_client.hbase.serializer.GenericJackson2JsonHbaseSerializer" />
+        </property>
+    </bean>
+
+    <!--
+    如果使用MapClient，必须初始化列的元数据，否则所有列均按String处理（通过put方法更新元数据）
+    TableColumnCacheManager.TABLE_COLUMN_CACHE_MAP
+    -->
+
+    <!-- Spring hadoop -->
+    <!--
+     注意：Spring hadoop使用的还是老旧API 目前2.4版本。每次获取table都是new HTable而不是conn.getTable 这里耗时很厉害。不建议使用
+     Spring hadoop目前还必须配置AOP 预加载table来做线程级别的缓存。（依然很慢）
+     connection.getTable:
+     autoFlush=true   cleanupConnectionOnClose=false   cleanupPoolOnClose=false
+     new HTable(conf, "name")
+     autoFlush=true   cleanupConnectionOnClose=true   cleanupPoolOnClose=true
+     -->
+    <!--<bean id="hbaseTemplate" class="org.springframework.data.hadoop.operations.HbaseTemplate" depends-on="hdConfFactory" >
+        <constructor-arg name="configuration" ref="hdConf"/>
+    </bean>
+
+    <bean id="fsShell" class="org.springframework.data.hadoop.fs.FsShell" depends-on="hdConfFactory">
+        <constructor-arg name="configuration" ref="hdConf"/>
+    </bean>-->
+
+</beans>
