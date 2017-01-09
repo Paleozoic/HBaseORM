@@ -56,11 +56,15 @@ public enum ScanUtils {
         Filter filter = new PageFilter(pageInfo.getPageSize());
         scan.setFilter(filter);
         scan = ScanUtils.addFilters(scan, filters);
+
         if (pageInfo.isPreviousPage()) {//向上翻页，不设置stopRow
             scan.setReversed(true);
             scan.setStartRow(pageInfo.getLastStartRow());
         } else {
             scan.setStartRow(pageInfo.getStartRow());
+            if(pageInfo.getStopRow()!=null){
+                scan.setStopRow(pageInfo.getStopRow());
+            }
         }
         return scan;
     }
