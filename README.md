@@ -15,3 +15,4 @@ it is a client for hadoop components,but up to now,it is only a hbase client.
 - 设计思路整理
 - 单元测试全覆盖
 - 增加多表关联的ORM查询以及插入
+- 降低Spring依赖，部分注入处使用单例模式
