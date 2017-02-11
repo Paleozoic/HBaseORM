@@ -1,6 +1,6 @@
 # hd-client
 it is a client for hadoop components,but up to now,it is only a hbase client.
-参考项目：[orm-hbase](https://github.com/zacharyzhanghao/orm-hbase) 
+参考项目：[orm-hbase](https://github.com/zacharyzhanghao/orm-hbase)
 
 # Client
 - HbaseClient:基于注解来确定Column Metadata，然后映射为对象。支持复杂对象映射（序列化映射以及拆分映射），支持Java集合映射（序列化）
@@ -14,3 +14,4 @@ it is a client for hadoop components,but up to now,it is only a hbase client.
 - 文档逐步完善
 - 设计思路整理
 - 单元测试全覆盖
+- 增加多表关联的ORM查询以及插入
