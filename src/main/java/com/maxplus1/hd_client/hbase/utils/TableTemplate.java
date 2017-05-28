@@ -13,18 +13,6 @@ import java.io.IOException;
 @Slf4j
 public class TableTemplate {
 
-    public static boolean opt(Table table,OptCallback optCallback){
-        try {
-            optCallback.doInTable(table);
-            return true;
-        } catch (Throwable e) {
-            log.error("[ERROR===>>>]"+e.getMessage(), e);
-            return false;
-        } finally {
-            releaseTable(table);
-        }
-    }
-
     public static <T> T opt(Table table,TableCallback<T> tableCallback){
         try {
             return tableCallback.doInTable(table);

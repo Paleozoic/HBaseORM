@@ -3,12 +3,14 @@ package com.maxplus1.hd_client.hbase.type.rtn_pojo;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.maxplus1.hd_client.hbase.type.resolvers.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author zachary.zhang
