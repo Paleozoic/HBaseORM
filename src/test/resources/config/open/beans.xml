@@ -27,6 +27,7 @@
     <bean id="hBaseSource" class="com.maxplus1.hd_client.hbase.config.HBaseSource">
         <constructor-arg name="configuration" ref="hbaseConfiguration"/>
     </bean>
+    <!-- 序列化器 -->
     <bean id="serializeTypeResolver" class="com.maxplus1.hd_client.hbase.type.resolvers.SerializeTypeResolver">
         <property name="hbaseSerializer">
             <bean class="com.maxplus1.hd_client.hbase.serializer.GenericJackson2JsonHbaseSerializer" />

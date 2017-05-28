@@ -1,7 +1,7 @@
 package com.maxplus1.test.hbase;
 
 import com.maxplus1.hd_client.hbase.operations.HbaseAdmin;
-import com.maxplus1.hd_client.hbase.operations.beans.PageInfo;
+import com.maxplus1.hd_client.hbase.operations.PageInfo;
 import com.maxplus1.hd_client.hbase.operations.client.rtn_pojo.HbaseClient;
 import com.maxplus1.test.pojo.User;
 import com.maxplus1.test.base.BaseTest;
@@ -31,7 +31,7 @@ public class OrmTest extends BaseTest{
     private HbaseAdmin admin;
 
     /**
-     * TODO Fusion Insigh HD 中，junit test会卡在Result result = table.get(get);原因不明。
+     * TODO Fusion Insight HD 中，junit test会卡在Result result = table.get(get);原因不明。
      * 但是将用例放在web工程而不是spring test，则可以测试通过。
      * What the fuck!
      */
@@ -122,6 +122,20 @@ public class OrmTest extends BaseTest{
                 i--;
             }
         }
+
+        log.info("findList by prerowkey starts!");
+        User preUser1 = new User("abcdefg1","test1",1);
+        User preUser2 = new User("abcdefg2","test2",2);
+        User preUser3= new User("abcdefg3","test3",3);
+        client.put(preUser1);
+        client.put(preUser2);
+        client.put(preUser3);
+        List<User> preUserList = client.findList("abcdefg", User.class);
+        Assert.assertEquals(preUserList.size(),3);
+        Assert.assertTrue(preUserList.contains(preUser1));
+        Assert.assertTrue(preUserList.contains(preUser2));
+        Assert.assertTrue(preUserList.contains(preUser3));
+        log.info("findList by prerowkey ends!");
 
         // delete list
         client.deleteList(rowKeyList,User.class);

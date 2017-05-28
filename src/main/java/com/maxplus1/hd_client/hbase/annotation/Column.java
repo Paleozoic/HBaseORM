@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.maxplus1.hd_client.hbase.annotation;
 
 import java.lang.annotation.ElementType;

@@ -4,8 +4,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.maxplus1.hd_client.hbase.config.HBaseSource;
 import com.maxplus1.hd_client.hbase.exception.HbaseClientException;
-import com.maxplus1.hd_client.hbase.funciton.rtn_pojo.Persistent;
-import com.maxplus1.hd_client.hbase.operations.beans.PageInfo;
+import com.maxplus1.hd_client.hbase.funciton.Readable;
+import com.maxplus1.hd_client.hbase.funciton.Writeable;
+import com.maxplus1.hd_client.hbase.operations.PageInfo;
 import com.maxplus1.hd_client.hbase.utils.HBaseUtils;
 import com.maxplus1.hd_client.hbase.utils.PageUtils;
 import com.maxplus1.hd_client.hbase.utils.ScanUtils;
@@ -21,18 +22,16 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * 面向用户接口
  * @author zachary.zhang
  * @author Paleo
  */
 @Slf4j
 @Component("com.maxplus1.hd_client.hbase.operations.client.rtn_pojo.HbaseClient")
-public class HbaseClient implements Persistent {
+public class HbaseClient implements Readable,Writeable {
 
     @Resource
     private BytesClient bytesClient;
-
-    @Resource
-    private HBaseSource hBaseSource;
 
     @Override
     public <T> T find(String rowKey, Class<T> type)  {
@@ -74,61 +73,17 @@ public class HbaseClient implements Persistent {
 
     @Override
     public void put(Object po)  {
-        Preconditions.checkNotNull(po, "[ERROR===>>>]persistent object can't be null");
-
-        // auto close the resources
-        try (Table table = hBaseSource.getTable(HBaseUtils.findTableName(po.getClass()))) {
-            Put put = HBaseUtils.wrapPut(po);
-            table.put(put);
-        } catch (Exception e) {
-            log.error("[ERROR===>>>]", e);
-            throw new HbaseClientException(e);
-        }
+        bytesClient.put(po);
     }
 
     @Override
     public <T> void putList(List<T> poList)  {
-        Preconditions.checkNotNull(poList, "[ERROR===>>>]persistent object list can't be null");
-        Preconditions.checkArgument(poList.size() != 0, "[ERROR===>>>]persistent object list can't be empty");
-        try (Table table = hBaseSource.getTable(HBaseUtils.findTableName(poList.get(0).getClass()))) {
-            List<Put> puts = HBaseUtils.wrapPutList(poList);
-            table.put(puts);
-        } catch (Exception e) {
-            log.error("[ERROR===>>>]", e);
-            throw new HbaseClientException(e);
-        }
+        bytesClient.putList(poList);
     }
 
     @Override
     public <T> PageInfo<T> findListByPage(PageInfo<T> pageInfo, Filter... filters) {
-
-        Preconditions.checkArgument(pageInfo.getPageSize() > 0, "[ERROR===>>>]page size must greater than 0");
-
-        Scan scan = ScanUtils.initScan(pageInfo,pageInfo.getPoClass(),filters);
-
-        List<T> resultList = Lists.newArrayList();
-        try (Table table = hBaseSource.getTable(HBaseUtils.findTableName(pageInfo.getPoClass()))) {
-            ResultScanner scanner = table.getScanner(scan);
-            Result result = null;
-            while ((result = scanner.next()) != null) {
-                T wrapResult = HBaseUtils.wrapResult(pageInfo.getPoClass(), result);
-                resultList.add(wrapResult);
-            }
-            if(pageInfo.isPreviousPage()){//如果是查询上一页数据，结果逆序
-                Collections.reverse(resultList);
-            }
-            pageInfo.setDataSet(resultList);
-            if (resultList != null && resultList.size() > 0) {
-                // 取到最后一条数据的rowkey作为新的startRow
-                T t = resultList.get(resultList.size() - 1);
-                //改变pageInfo的一些数据
-                pageInfo = PageUtils.changePageInfo(pageInfo, HBaseUtils.getRowKeyFromPo(resultList.get(0)),HBaseUtils.getRowKeyFromPo(t));
-            }
-        } catch (Exception e) {
-            log.error("[ERROR===>>>]", e);
-            throw new HbaseClientException(e);
-        }
-        return pageInfo;
+        return bytesClient.findListByPage(pageInfo,filters);
     }
 
 }

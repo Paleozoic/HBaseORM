@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 用于解析注解元数据
  * Created by qxloo on 2017/1/4.
  */
 public enum AnnoSchemeUtils {
@@ -30,7 +31,7 @@ public enum AnnoSchemeUtils {
     }
 
     /**
-     * 根据class type找到column info,返回list
+     * 根据class type找到column info,返回TableDefinition
      *
      * @param classType
      * @return

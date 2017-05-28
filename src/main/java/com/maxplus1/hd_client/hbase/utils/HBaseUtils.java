@@ -190,32 +190,4 @@ public enum HBaseUtils {
         return resolveToBytes(rowkeyDefinition.getFieldType(), object);
     }
 
-
-    /*public static byte[] objToBytes(Object obj) {
-        byte[] bytes = null;
-        if (obj instanceof ByteBuffer) {
-            bytes = Bytes.toBytes((ByteBuffer) obj);
-        } else if (obj instanceof ByteBuffer) {
-            bytes = Bytes.toBytes((ByteBuffer) obj);
-        } else if (obj instanceof String) {
-            bytes = Bytes.toBytes((String) obj);
-        } else if (obj instanceof Boolean) {
-            bytes = Bytes.toBytes((boolean) obj);
-        } else if (obj instanceof Long) {
-            bytes = Bytes.toBytes((long) obj);
-        } else if (obj instanceof Float) {
-            bytes = Bytes.toBytes((float) obj);
-        } else if (obj instanceof Double) {
-            bytes = Bytes.toBytes((double) obj);
-        } else if (obj instanceof Integer) {
-            bytes = Bytes.toBytes((int) obj);
-        } else if (obj instanceof Short) {
-            bytes = Bytes.toBytes((short) obj);
-        } else if (obj instanceof BigDecimal) {
-            bytes = Bytes.toBytes((BigDecimal) obj);
-        } else if (obj instanceof byte[]) {
-            bytes = (byte[]) obj;
-        }
-        return bytes;
-    }*/
 }

@@ -1,7 +1,6 @@
 package com.maxplus1.test.hbase;
 
 import com.maxplus1.hd_client.hbase.operations.HbaseAdmin;
-import com.maxplus1.hd_client.hbase.operations.client.rtn_map.MapClient;
 import com.maxplus1.hd_client.hbase.operations.client.spring_hbase.HbaseTemplate;
 import com.maxplus1.test.base.BaseTest;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +39,9 @@ public class SpringHadoopTest extends BaseTest {
         log.info("create table :{},column family :{}","test:user","info");
 
 
+        //delete table
+        admin.deleteTable("test:user");
+        log.info("delete table :{}","test:user");
     }
 
 }

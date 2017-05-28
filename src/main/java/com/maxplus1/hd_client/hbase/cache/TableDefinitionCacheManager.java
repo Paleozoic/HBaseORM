@@ -3,7 +3,9 @@ package com.maxplus1.hd_client.hbase.cache;
 import com.maxplus1.hd_client.hbase.operations.client.rtn_pojo.beans.ColumnDefinition;
 import com.maxplus1.hd_client.hbase.operations.client.rtn_pojo.beans.RowkeyDefinition;
 import com.maxplus1.hd_client.hbase.operations.client.rtn_pojo.beans.TableDefinition;
+import com.maxplus1.hd_client.hbase.operations.client.spring_hbase.beans.ColumnMetaData;
 import org.apache.hadoop.hbase.client.Get;
+import org.apache.hadoop.hbase.client.Query;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.util.Bytes;
 
@@ -15,6 +17,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class TableDefinitionCacheManager {
 
+    /**
+     * 缓存这类注解的解析结果：TableDefinition。减少反射消耗
+     */
     private final static ConcurrentHashMap<Class,TableDefinition> COLUMN_DEFINITION_CACHE_MAP = new ConcurrentHashMap<>();
 
     public static void put(Class clz,TableDefinition tableDefinition){
@@ -25,50 +30,46 @@ public class TableDefinitionCacheManager {
         return COLUMN_DEFINITION_CACHE_MAP.get(clz);
     }
 
-    public static Scan buildScan(Scan scan,Class classType,boolean isInRecursion){
+
+    /**
+     * 注意此处的递归调用
+     * @param query
+     * @param classType
+     * @param isInRecursion
+     * @param <T>
+     * @return
+     */
+    public static  <T extends Query>  T buildQuery(T query, Class classType, boolean isInRecursion){
         TableDefinition tableDefinition = TableDefinitionCacheManager.get(classType);
         RowkeyDefinition rowkeyDefinition = tableDefinition.getRowkeyDefinition();
         if(isInRecursion){
             if(rowkeyDefinition.isHasRoweyAndColumnAnno()){//具有column注解，当做普通字段处理
                 if (rowkeyDefinition.hasColumnFamily()) {
-                    scan.addColumn(Bytes.toBytes(rowkeyDefinition.getColumnFamily()),Bytes.toBytes(rowkeyDefinition.getColumnName()));
+                    addColumn(query,rowkeyDefinition);
                 } else {
-                    buildScan(scan,rowkeyDefinition.getFieldType(),true);
+                    buildQuery(query,rowkeyDefinition.getFieldType(),true);
                 }
             }
         }
         List<ColumnDefinition> columnDefinitions = tableDefinition.getColumnDefinitionList();
         for (ColumnDefinition columnDefinition : columnDefinitions) {
             if(columnDefinition.hasColumnFamily()){
-                scan.addColumn(Bytes.toBytes(columnDefinition.getColumnFamily()),Bytes.toBytes(columnDefinition.getColumnName()));
+                addColumn(query,columnDefinition);
             }else{
-                buildScan(scan,columnDefinition.getFieldType(),true);
+                buildQuery(query,columnDefinition.getFieldType(),true);
             }
         }
-        return scan;
+        return query;
     }
 
-    public static Get buildGet(Get get, Class classType,boolean isInRecursion){
-        TableDefinition tableDefinition = TableDefinitionCacheManager.get(classType);
-        RowkeyDefinition rowkeyDefinition = tableDefinition.getRowkeyDefinition();
-        if(isInRecursion){
-            if(rowkeyDefinition.isHasRoweyAndColumnAnno()){//具有column注解，当做普通字段处理
-                if (rowkeyDefinition.hasColumnFamily()) {
-                    get.addColumn(Bytes.toBytes(rowkeyDefinition.getColumnFamily()),Bytes.toBytes(rowkeyDefinition.getColumnName()));
-                } else {
-                    buildGet(get,rowkeyDefinition.getFieldType(),true);
-                }
-            }
+    private static <T extends Query> void addColumn(T query,ColumnMetaData columnMetaData){
+        if(query instanceof Scan){
+            ((Scan)query).addColumn(Bytes.toBytes(columnMetaData.getColumnFamily()),Bytes.toBytes(columnMetaData.getColumnName()));
+        }else if (query instanceof Get){
+            ((Get)query).addColumn(Bytes.toBytes(columnMetaData.getColumnFamily()),Bytes.toBytes(columnMetaData.getColumnName()));
+        }else {
+            //TODO: Unexpected Type.it must be Get or Scan
         }
-        List<ColumnDefinition> columnDefinitions = tableDefinition.getColumnDefinitionList();
-        for (ColumnDefinition columnDefinition : columnDefinitions) {
-            if(columnDefinition.hasColumnFamily()){
-                get.addColumn(Bytes.toBytes(columnDefinition.getColumnFamily()),Bytes.toBytes(columnDefinition.getColumnName()));
-            }else{
-                buildGet(get,columnDefinition.getFieldType(),true);
-            }
-        }
-        return get;
     }
 
 }

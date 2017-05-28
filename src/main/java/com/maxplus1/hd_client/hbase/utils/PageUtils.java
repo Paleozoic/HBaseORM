@@ -1,6 +1,6 @@
 package com.maxplus1.hd_client.hbase.utils;
 
-import com.maxplus1.hd_client.hbase.operations.beans.PageInfo;
+import com.maxplus1.hd_client.hbase.operations.PageInfo;
 import org.apache.hadoop.hbase.util.Bytes;
 
 /**

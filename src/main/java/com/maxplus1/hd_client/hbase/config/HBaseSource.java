@@ -1,5 +1,6 @@
 package com.maxplus1.hd_client.hbase.config;
 
+import com.maxplus1.hd_client.hbase.exception.HbaseClientException;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.hadoop.conf.Configuration;
@@ -40,8 +41,12 @@ public class HBaseSource {
      * @param tableName
      * @return Table
      */
-    public Table getTable(String tableName) throws IOException {
-        return this.getConn().getTable(TableName.valueOf(tableName));
+    public Table getTable(String tableName)  {
+        try {
+            return this.getConn().getTable(TableName.valueOf(tableName));
+        } catch (IOException e) {
+            throw new HbaseClientException(e);
+        }
     }
 
     public Admin getAdmin() throws IOException {

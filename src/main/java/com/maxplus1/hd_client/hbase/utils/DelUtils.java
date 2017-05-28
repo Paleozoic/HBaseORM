@@ -15,42 +15,41 @@ import java.util.List;
 @Slf4j
 public enum DelUtils {
     ;
+
+    /**
+     * 根据rowkey删除Table的一行数据
+     * @param table
+     * @param rowkey
+     * @return
+     */
     public static boolean delete(Table table,String rowkey) {
-        try {
-            Delete delete = new Delete(Bytes.toBytes(rowkey));
-            table.delete(delete);
-            return true;
-        } catch (IOException e) {
-            log.error("[ERROR===>>>]delete the rowkey ["+rowkey+"] error!", e);
-            return false;
-        } finally {
-            try {
-                table.close();
-            } catch (IOException e) {
-                log.error("[ERROR===>>>]close table error!", e);
+        return TableTemplate.opt(table, new OptCallback<Boolean>() {
+            @Override
+            public void doInTable(Table table) throws IOException {
+                Delete delete = new Delete(Bytes.toBytes(rowkey));
+                table.delete(delete);
             }
-        }
+        });
     }
 
+    /**
+     * 根据rowkeyList删除Table的多行数据
+     * @param table
+     * @param rowkeyList
+     * @return
+     */
     public static boolean deleteList(Table table,List<String> rowkeyList) {
-        try {
-            List<Delete> list = new ArrayList<>();
-            for (String rowkey : rowkeyList) {
-                Delete delete = new Delete(Bytes.toBytes(rowkey));
-                list.add(delete);
+        return TableTemplate.opt(table, new OptCallback<Boolean>() {
+            @Override
+            public void doInTable(Table table) throws IOException {
+                List<Delete> list = new ArrayList<>();
+                for (String rowkey : rowkeyList) {
+                    Delete delete = new Delete(Bytes.toBytes(rowkey));
+                    list.add(delete);
+                }
+                table.delete(list);
             }
-            table.delete(list);
-            return true;
-        } catch (IOException e) {
-            log.error("[ERROR===>>>]delete rowkey list error!", e);
-            return false;
-        } finally {
-            try {
-                table.close();
-            } catch (IOException e) {
-                log.error("[ERROR===>>>]close table error!", e);
-            }
-        }
+        });
     }
 
 }

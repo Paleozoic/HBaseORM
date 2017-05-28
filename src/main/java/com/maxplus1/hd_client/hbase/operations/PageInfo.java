@@ -1,8 +1,9 @@
-package com.maxplus1.hd_client.hbase.operations.beans;
+package com.maxplus1.hd_client.hbase.operations;
 
 import java.util.List;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.apache.hadoop.hbase.util.Bytes;
@@ -17,6 +18,7 @@ import org.codehaus.jackson.type.TypeReference;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class PageInfo<T> {
 
     private Class<T> poClass;
@@ -60,8 +62,7 @@ public class PageInfo<T> {
 
     /**
      * 每页显示多少行数据.default是100条数据
-     * 
-     * <pre>注意：一经设置，中途查询数据的过程中，请勿修改
+     * 注意：一经设置，中途查询数据的过程中，请勿修改
      */
     private int pageSize = 100;
 
@@ -96,9 +97,6 @@ public class PageInfo<T> {
 
     public boolean isPreviousPage(){
         return prePageNo - currentPage == 1;
-    }
-
-    public PageInfo() {
     }
 
     public PageInfo(Class<T> poClass) {
