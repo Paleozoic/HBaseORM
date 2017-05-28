@@ -65,7 +65,7 @@ public enum HBaseUtils {
             TableDefinition tableDefinition = AnnoSchemeUtils.findTableDefinition(po);
             List<ColumnDefinition> columnInfoList = tableDefinition.getColumnDefinitionList();
             RowkeyDefinition rowkeyDefinition = tableDefinition.getRowkeyDefinition();
-            if(put==null){
+            if(put==null){ //put为null，证明没有进入递归
                 byte[] rowKey = resolveToBytes(rowkeyDefinition.getFieldType(), rowkeyDefinition.getRowKey().get(po));
                 put = new Put(rowKey);
             }else {//put不为null，证明已经进入递归

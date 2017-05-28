@@ -7,7 +7,7 @@ it is a client for hadoop components,but up to now,it is only a hbase client.
 - HbaseTemplate:与Spring Hadoop提供一样的API，但更加高效。对比版本为Spring Hadoop 2.4。
 
 # 使用方法
-[详见单元测试](https://github.com/Paleozoic/hd-client/tree/master/src/test/hbase)
+[详见单元测试](https://github.com/Paleozoic/hd-client/tree/master/src/test/java/com/maxplus1/test/hbase)
 
 # TODO
 - 文档逐步完善
