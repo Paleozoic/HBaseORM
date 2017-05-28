@@ -6,7 +6,8 @@ import com.maxplus1.hd_client.hbase.config.HBaseSource;
 import com.maxplus1.hd_client.hbase.funciton.BytesReadable;
 import com.maxplus1.hd_client.hbase.funciton.BytesWriteable;
 import com.maxplus1.hd_client.hbase.operations.PageInfo;
-import com.maxplus1.hd_client.hbase.operations.client.spring_hbase.TableCallback;
+import com.maxplus1.hd_client.hbase.operations.client.TableCallback;
+import com.maxplus1.hd_client.hbase.operations.client.spring_hbase.HbaseTemplate;
 import com.maxplus1.hd_client.hbase.utils.*;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,11 +34,13 @@ public class BytesClient implements BytesReadable,BytesWriteable {
     @Resource
     private HBaseSource hBaseSource;
 
+    @Resource
+    private HbaseTemplate hbaseTemplate;
+
     @Override
     public <T> T find(byte[] rowKey, Class<T> type)  {
         Preconditions.checkNotNull(rowKey, "[ERROR===>>>]rowKey can't be null");
-        Table table =  this.hBaseSource.getTable(HBaseUtils.findTableName(type));
-        return TableTemplate.opt(table,new TableCallback<T>() {
+        return hbaseTemplate.execute(HBaseUtils.findTableName(type),new TableCallback<T>() {
             @Override
             public T doInTable(Table table) throws IOException, IllegalAccessException, InstantiationException {
                 Get get = GetUtils.initGet(rowKey,type);
@@ -52,8 +55,7 @@ public class BytesClient implements BytesReadable,BytesWriteable {
     public <T> List<T> findList(List<byte[]> rowKeyList, Class<T> type){
         Preconditions.checkNotNull(rowKeyList, "[ERROR===>>>]rowKey list can't be null");
         Preconditions.checkArgument(rowKeyList.size() != 0, "[ERROR===>>>]rowKey  list can't be empty");
-        Table table =  this.hBaseSource.getTable(HBaseUtils.findTableName(type));
-        return TableTemplate.opt(table,new TableCallback<List<T>>() {
+        return hbaseTemplate.execute(HBaseUtils.findTableName(type),new TableCallback<List<T>>() {
             @Override
             public List<T> doInTable(Table table) throws IOException, IllegalAccessException, InstantiationException {
                 List<Get> gets = Lists.newArrayList();
@@ -72,8 +74,7 @@ public class BytesClient implements BytesReadable,BytesWriteable {
     @Override
     public <T> List<T> findList(byte[] startRow, byte[] endRow, Class<T> type) {
         Preconditions.checkNotNull(type, "[ERROR===>>>]class type can't be null");
-        Table table =  this.hBaseSource.getTable(HBaseUtils.findTableName(type));
-        return TableTemplate.opt(table, new TableCallback<List<T>>() {
+        return hbaseTemplate.execute(HBaseUtils.findTableName(type), new TableCallback<List<T>>() {
             @Override
             public List<T> doInTable(Table table) throws IOException, IllegalAccessException, InstantiationException {
                 Scan scan = ScanUtils.initScan(startRow, endRow);
@@ -94,8 +95,7 @@ public class BytesClient implements BytesReadable,BytesWriteable {
     @Override
     public <T> List<T> findList(byte[] preRowkey, Class<T> type)  {
         Preconditions.checkNotNull(type, "[ERROR===>>>]class type can't be null");
-        Table table =  this.hBaseSource.getTable(HBaseUtils.findTableName(type));
-        return TableTemplate.opt(table, new TableCallback<List<T>>() {
+        return hbaseTemplate.execute(HBaseUtils.findTableName(type), new TableCallback<List<T>>() {
             @Override
             public List<T> doInTable(Table table) throws IOException, IllegalAccessException, InstantiationException {
                 byte[] startRow = null,endRow = null;
@@ -119,8 +119,7 @@ public class BytesClient implements BytesReadable,BytesWriteable {
     @Override
     public void put(Object po)  {
         Preconditions.checkNotNull(po, "[ERROR===>>>]persistent object can't be null");
-        Table table = hBaseSource.getTable(HBaseUtils.findTableName(po.getClass()));
-        TableTemplate.opt(table, new TableCallback() {
+        hbaseTemplate.execute(HBaseUtils.findTableName(po.getClass()), new TableCallback() {
             @Override
             public Object doInTable(Table table) throws IOException, IllegalAccessException, InstantiationException {
                 Put put = HBaseUtils.wrapPut(po);
@@ -135,8 +134,7 @@ public class BytesClient implements BytesReadable,BytesWriteable {
     public <T> void putList(List<T> poList)  {
         Preconditions.checkNotNull(poList, "[ERROR===>>>]persistent object list can't be null");
         Preconditions.checkArgument(poList.size() != 0, "[ERROR===>>>]persistent object list can't be empty");
-        Table table = hBaseSource.getTable(HBaseUtils.findTableName(poList.get(0).getClass()));
-        TableTemplate.opt(table, new TableCallback() {
+        hbaseTemplate.execute(HBaseUtils.findTableName(poList.get(0).getClass()), new TableCallback() {
             @Override
             public Object doInTable(Table table) throws IOException, IllegalAccessException, InstantiationException {
                 List<Put> puts = HBaseUtils.wrapPutList(poList);
@@ -149,8 +147,7 @@ public class BytesClient implements BytesReadable,BytesWriteable {
     @Override
     public void delete(byte[] rowKey, Class<?> po)  {
         Preconditions.checkNotNull(po, "[ERROR===>>>]persistent po class can't be null");
-        Table table = hBaseSource.getTable(HBaseUtils.findTableName(po));
-        TableTemplate.opt(table, new TableCallback() {
+        hbaseTemplate.execute(HBaseUtils.findTableName(po), new TableCallback() {
             @Override
             public Object doInTable(Table table) throws Throwable {
                 table.delete(HBaseUtils.wrapDelete(rowKey));
@@ -163,8 +160,7 @@ public class BytesClient implements BytesReadable,BytesWriteable {
     @Override
     public void deleteList(List<byte[]> rowKeyList, Class<?> po) {
         Preconditions.checkNotNull(po, "[ERROR===>>>]persistent po class can't be null");
-        Table table = hBaseSource.getTable(HBaseUtils.findTableName(po));
-        TableTemplate.opt(table, new TableCallback() {
+        hbaseTemplate.execute(HBaseUtils.findTableName(po), new TableCallback() {
             @Override
             public Object doInTable(Table table) throws IOException, IllegalAccessException, InstantiationException {
                 List<Delete> deleteList = Lists.newArrayList();
@@ -185,8 +181,7 @@ public class BytesClient implements BytesReadable,BytesWriteable {
         Scan scan = ScanUtils.initScan(pageInfo,pageInfo.getPoClass(),filters);
 
         List<T> resultList = Lists.newArrayList();
-        Table table = hBaseSource.getTable(HBaseUtils.findTableName(pageInfo.getPoClass()));
-        return TableTemplate.opt(table, new TableCallback<PageInfo<T>>() {
+        return hbaseTemplate.execute(HBaseUtils.findTableName(pageInfo.getPoClass()), new TableCallback<PageInfo<T>>() {
             @Override
             public PageInfo<T> doInTable(Table table) throws IOException, IllegalAccessException, InstantiationException {
                 ResultScanner scanner = table.getScanner(scan);

@@ -1,4 +1,4 @@
-package com.maxplus1.hd_client.hbase.operations.client.spring_hbase.beans;
+package com.maxplus1.hd_client.hbase.operations.client;
 
 
 import lombok.AllArgsConstructor;

@@ -3,7 +3,7 @@ package com.maxplus1.hd_client.hbase.cache;
 import com.maxplus1.hd_client.hbase.operations.client.rtn_pojo.beans.ColumnDefinition;
 import com.maxplus1.hd_client.hbase.operations.client.rtn_pojo.beans.RowkeyDefinition;
 import com.maxplus1.hd_client.hbase.operations.client.rtn_pojo.beans.TableDefinition;
-import com.maxplus1.hd_client.hbase.operations.client.spring_hbase.beans.ColumnMetaData;
+import com.maxplus1.hd_client.hbase.operations.client.ColumnMetaData;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Query;
 import org.apache.hadoop.hbase.client.Scan;

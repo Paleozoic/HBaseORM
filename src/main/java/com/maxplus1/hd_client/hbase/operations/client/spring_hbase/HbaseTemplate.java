@@ -2,6 +2,7 @@ package com.maxplus1.hd_client.hbase.operations.client.spring_hbase;
 
 import com.maxplus1.hd_client.hbase.config.HBaseSource;
 import com.maxplus1.hd_client.hbase.exception.HbaseClientException;
+import com.maxplus1.hd_client.hbase.operations.client.TableCallback;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.springframework.stereotype.Component;

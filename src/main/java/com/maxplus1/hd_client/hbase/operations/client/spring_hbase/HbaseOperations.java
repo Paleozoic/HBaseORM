@@ -1,5 +1,6 @@
 package com.maxplus1.hd_client.hbase.operations.client.spring_hbase;
 
+import com.maxplus1.hd_client.hbase.operations.client.TableCallback;
 import org.apache.hadoop.hbase.client.Scan;
 
 import java.util.List;
