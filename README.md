@@ -9,6 +9,10 @@ it is a client for hadoop components,but up to now,it is only a hbase client.
 # 使用方法
 [详见单元测试](https://github.com/Paleozoic/hd-client/tree/master/src/test/java/com/maxplus1/test/hbase)
 
+# 扩展
+- 使用不同的序列化工具，只需要实现`HbaseSerializer`接口即可，然后在配置文件注入序列化器。
+- 扩展类型处理：只需要在`resolvers`包下添加新的`TargetTypeResolver`子类，然后在`TypeResolverFactory`添加都新类型的处理逻辑。
+
 # TODO
 - 文档逐步完善
 - 设计思路整理
