@@ -47,6 +47,11 @@ public enum AnnoSchemeUtils {
             List<ColumnDefinition> columnDefinitions = new ArrayList<>();
             for (Field field : fields) {
                 field.setAccessible(true);
+                /**
+                 * 同时具有RowKey和Column注解，表示
+                 * 需要生成RowkeyDefinition，并且设置该Rowkey的列族和列。
+                 * 这种情况，如果是处理复杂对象的时候，被递归调用，则当做Column处理；如果不是被递归调用，则当做RowKey处理
+                 */
                 if (field.isAnnotationPresent(RowKey.class)&&field.isAnnotationPresent(Column.class)) {
                     RowkeyDefinition rowkeyDefinition = new RowkeyDefinition();
                     rowkeyDefinition.setFieldType(field.getType());
@@ -67,12 +72,12 @@ public enum AnnoSchemeUtils {
                     }
 
                     tableDefinition.setRowkeyDefinition(rowkeyDefinition);
-                } else if (field.isAnnotationPresent(RowKey.class)) {
+                } else if (field.isAnnotationPresent(RowKey.class)) { //只当做RowKey处理
                     RowkeyDefinition rowkeyDefinition = new RowkeyDefinition();
                     rowkeyDefinition.setFieldType(field.getType());
                     rowkeyDefinition.setRowKey(field);
                     tableDefinition.setRowkeyDefinition(rowkeyDefinition);
-                } else if (field.isAnnotationPresent(Column.class)) {
+                } else if (field.isAnnotationPresent(Column.class)) {//只当作Column处理
                     Column hbaseColumn = field.getAnnotation(Column.class);
                     Preconditions.checkState(!(StringUtils.isBlank(hbaseColumn.family()) && SysUtils.isJavaClass(classType)), "[ERROR===>>>]if not customized type,operations column family can't be null");
                     ColumnDefinition colDef = new ColumnDefinition();
