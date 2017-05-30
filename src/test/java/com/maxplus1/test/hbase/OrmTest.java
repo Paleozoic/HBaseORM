@@ -100,8 +100,9 @@ public class OrmTest extends BaseTest{
         Random random = new Random();
         //TODO 边界处理
         //因为只有5页，暂时不处理边界情况
-        for(int i=0;i<50;i++){
-            if(random.nextBoolean()&&pageInfo.getCurrentPage()>1){//向上翻页
+        for(int i=0;i<500;i++){
+            boolean flag = random.nextBoolean();
+            if(flag&&pageInfo.getCurrentPage()>1){//向上翻页
                 //向上翻一页
                 pageInfo.setPrePageNo(pageInfo.getCurrentPage());
                 pageInfo.setCurrentPage(pageInfo.getCurrentPage()-1);
@@ -109,7 +110,7 @@ public class OrmTest extends BaseTest{
                 log.info("last page is {},size is {}",scanLastPage.getCurrentPage(),scanLastPage.getDataSet().size());
                 Assert.assertEquals(10,scanLastPage.getDataSet().size());
                 Assert.assertEquals(rowKeyList.subList((pageInfo.getCurrentPage()-1)*10,pageInfo.getCurrentPage()*10),OrmModel.getAllUUid(scanLastPage.getDataSet()));
-            }else if(!random.nextBoolean()&&pageInfo.getCurrentPage()<5){//向下翻页
+            }else if(!flag&&pageInfo.getCurrentPage()<5){//向下翻页
                 //向下翻一页
                 pageInfo.setPrePageNo(pageInfo.getCurrentPage());
                 pageInfo.setCurrentPage(pageInfo.getCurrentPage()+1);
